@@ -23,7 +23,6 @@ const App = () => {
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/favorite" element={<Favourite />} />
       </Routes>
-      {!isAdminRoute && <Navbar />}
       {!isAdminRoute && <Footer />}
     </>
   );
