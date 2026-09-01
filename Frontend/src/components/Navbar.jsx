@@ -22,10 +22,7 @@ const Navbar = () => {
           isOpen ? 'max-md:w-full' : 'max-md:w-0'
         }`}
       >
-        <XIcon
-          className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer"
-          onClick={() => setIsOpen(false)}
-        />
+        <XIcon className="md:hidden absolute top-6 right-6 w-6 h-6 cursor-pointer" onClick={() => setIsOpen(false)} />
 
         <Link onClick={handleLinkClick} to="/">
           Home
@@ -33,10 +30,10 @@ const Navbar = () => {
         <Link onClick={handleLinkClick} to="/movies">
           Movies
         </Link>
-        <Link onClick={handleLinkClick} to="/">
+        <Link onClick={handleLinkClick} to="/theatre">
           Theatre
         </Link>
-        <Link onClick={handleLinkClick} to="/">
+        <Link onClick={handleLinkClick} to="/Release">
           Release
         </Link>
         <Link onClick={handleLinkClick} to="/favorite">
@@ -50,10 +47,7 @@ const Navbar = () => {
           Login
         </button>
       </div>
-      <MenuIcon
-        className="max-md:ml-4 md:hidden w-8 h-8 cursor-pointer"
-        onClick={() => setIsOpen(!isOpen)}
-      />
+      <MenuIcon className="max-md:ml-4 md:hidden w-8 h-8 cursor-pointer" onClick={() => setIsOpen(!isOpen)} />
     </div>
   );
 };
