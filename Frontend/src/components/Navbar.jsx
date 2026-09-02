@@ -11,7 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   const handleLinkClick = () => {
-    window.scrollTo(0, 0);
+    scrollTo(0, 0);
     setIsOpen(false);
   };
 
