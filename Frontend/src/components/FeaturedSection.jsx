@@ -9,7 +9,7 @@ const FeaturedSection = () => {
 
   return (
     <div className="px-6 md:px-16 lg:px-24 xl:px-44 overflow-hidden">
-      <div className="relative flex items-center justify-between pt-20 pb-10">
+      <div className="relative flex items-center justify-between pt-20 pb-10 isolate">
         <BlurCircle top="0" right="-80px" />
         <p className="text-gray-300 font-medium text-lg">Now Showing</p>
         <button onClick={() => navigate('/movies')} className="group flex items-center gap-2 text-sm text-gray-300">
@@ -17,7 +17,7 @@ const FeaturedSection = () => {
         </button>
       </div>
 
-      <div className="flex flex-wrap max-sm:justify-center gap-8 mt-8">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8 mt-8">
         {dummyShowsData.slice(0, 4).map((show) => (
           <MovieCard key={show._id} movie={show} />
         ))}
