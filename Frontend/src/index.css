@@ -3,7 +3,7 @@
 
 @theme {
   --color-primary: #f84565;
-  --color-primary: #d638d6;
+  --color-primary-dull: #d63854;
 }
 * {
   font-family: 'Outfit', sans-serif;
