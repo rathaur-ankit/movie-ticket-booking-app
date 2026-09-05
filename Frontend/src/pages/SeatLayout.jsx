@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { assets, dummyDateTimeData, dummyShowsData } from '../assets/assets';
 import Loading from '../components/Loading';
@@ -19,19 +19,19 @@ const SeatLayout = () => {
   const { id, date } = useParams();
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
-  const [show, setShow] = useState(null);
+
+  const show = useMemo(() => {
+    const movie = dummyShowsData.find((show) => show._id === id);
+    if (movie) {
+      return {
+        movie,
+        dateTime: dummyDateTimeData,
+      };
+    }
+    return null;
+  }, [id]);
 
   const navigate = useNavigate();
-
-  const getShow = async () => {
-    const show = dummyShowsData.find((show) => show._id === id);
-    if (show) {
-      setShow({
-        movie: show,
-        dateTime: dummyDateTimeData,
-      });
-    }
-  };
 
   const handleSeatClick = (seatId) => {
     if (!selectedTime) return toast('Please select time first');
@@ -58,10 +58,6 @@ const SeatLayout = () => {
     </div>
   );
 
-  useEffect(() => {
-    getShow();
-  }, []);
-
   return show ? (
     <div className="flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50">
       {/*available timings */}
@@ -69,16 +65,20 @@ const SeatLayout = () => {
         <p className="text-lg font-semibold px-6">Available Timings</p>
 
         <div className="mt-5 space-y-1">
-          {show.dateTime[date].map((item) => (
-            <div
-              key={item.time}
-              onClick={() => setSelectedTime(item)}
-              className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${selectedTime?.time === item.time ? 'bg-primary text-white' : 'hover:bg-primary/20'}`}
-            >
-              <ClockIcon className="w-4 h-4" />
-              <p className="text-sm">{isoTimeFormat(item.time)}</p>
-            </div>
-          ))}
+          {show.dateTime[date] ? (
+            show.dateTime[date].map((item) => (
+              <div
+                key={item.time}
+                onClick={() => setSelectedTime(item)}
+                className={`flex items-center gap-2 px-6 py-2 w-max rounded-r-md cursor-pointer transition ${selectedTime?.time === item.time ? 'bg-primary text-white' : 'hover:bg-primary/20'}`}
+              >
+                <ClockIcon className="w-4 h-4" />
+                <p className="text-sm">{isoTimeFormat(item.time)}</p>
+              </div>
+            ))
+          ) : (
+            <p className="text-sm text-gray-400 px-6 py-2">No timings available</p>
+          )}
         </div>
       </div>
 
