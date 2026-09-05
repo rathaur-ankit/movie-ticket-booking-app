@@ -11,7 +11,7 @@ const DateSelect = ({ dateTime, id }) => {
 
   const onBookHandler = () => {
     if (!selected) return toast('Please select a date ');
-    navigate(`/movies/${id}/${selected}`);
+    navigate(`/movie/${id}/${selected}`);
     scrollTo(0, 0);
   };
 
