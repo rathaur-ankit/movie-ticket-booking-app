@@ -28,11 +28,12 @@ const App = () => {
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/favorite" element={<Favourite />} />
 
-        <Route path="/admin/*" element={<Layout />} />
-        <Route index element={<Dashboard />} />
-        <Route path="add-shows" element={<AddShows />} />
-        <Route path="list-shows" element={<ListShows />} />
-        <Route path="list-bookings" element={<ListBookings />} />
+        <Route path="/admin" element={<Layout />}>
+          <Route index element={<Dashboard />} />
+          <Route path="add-shows" element={<AddShows />} />
+          <Route path="list-shows" element={<ListShows />} />
+          <Route path="list-bookings" element={<ListBookings />} />
+        </Route>
       </Routes>
       {!isAdminRoute && <Footer />}
     </>
