@@ -29,6 +29,16 @@ const AddShows = () => {
     });
   };
 
+  const handleRemoveTime = (date, time) => {
+    setDateTimeSelection((prev) => {
+      const filteredTimes = prev[date].filter((t) => t !== time);
+      if (filteredTimes.length === 0) {
+        const { [date]: _, ...rest } = prev;
+        return rest;
+      }
+    });
+  };
+
   useEffect(() => {
     fetchNowPlayingMovies();
   }, []);
