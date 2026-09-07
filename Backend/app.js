@@ -18,5 +18,8 @@ app.use(
 );
 
 // routes start from here
+app.get('/', (req, res) => {
+  res.status(200).send('Server is Live');
+});
 
 export { app };
