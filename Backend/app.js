@@ -18,3 +18,5 @@ app.use(
 );
 
 // routes start from here
+
+export { app };
