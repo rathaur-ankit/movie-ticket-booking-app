@@ -4,6 +4,8 @@ import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import { urlencoded } from 'express';
 import { clerkMiddleware } from '@clerk/express';
+import { serve } from 'inngest/express';
+import { inngest, functions } from './src/utils/inngest.js';
 
 const app = express();
 
@@ -20,7 +22,7 @@ app.use(
 );
 
 // routes start from here
-
+app.use('/api/v1/inngest', serve({ client: inngest, functions }));
 app.get('/', (req, res) => {
   res.status(200).send('Server is Live');
 });
