@@ -14,3 +14,5 @@ const getNowPlayingMovies = async (req, res) => {
     });
   }
 };
+
+export {getNowPlayingMovies};
