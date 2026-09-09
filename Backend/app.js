@@ -6,6 +6,7 @@ import { urlencoded } from 'express';
 import { clerkMiddleware } from '@clerk/express';
 import { serve } from 'inngest/express';
 import { inngest, functions } from './src/utils/inngest.js';
+import { showRouter } from './src/routes/show.routes.js';
 
 const app = express();
 
@@ -26,5 +27,6 @@ app.use('/api/v1/inngest', serve({ client: inngest, functions }));
 app.get('/', (req, res) => {
   res.status(200).send('Server is Live');
 });
+app.user('/api/v1/show', showRouter);
 
 export { app };
