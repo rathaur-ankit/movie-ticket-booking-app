@@ -1,7 +1,6 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
 import { Show } from '../models/show.models.js';
-import axios from 'axios';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
@@ -24,15 +23,16 @@ const getNowPlayingMovies = async (req, res) => {
 const addShow = async (req, res) => {
   try {
     const { movieId, showsInput, showPrice } = req.body;
-    let movie = await Movie.findById(movieId);
+
+    if (!movieId) {
+      return res.status(400).json({ success: false, message: 'movieId is required' });
+    }
+
+    let movie = await Movie.findOne({ id: movieId });
     if (!movie) {
       const [movieDetailsResponse, movieCreditsResponse] = await Promise.all([
-        axios.get(`https://api.themoviedb.org/3/movie/${movieId}`, {
-          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` },
-        }),
-        axios.get(`https://api.themoviedb.org/3/movie/${movieId}/credits`, {
-          headers: { Authorization: `Bearer ${process.env.TMDB_API_KEY}` },
-        }),
+        tmdbApi.get(`/movie/${movieId}`),
+        tmdbApi.get(`/movie/${movieId}/credits`),
       ]);
       const movieApiData = movieDetailsResponse.data;
       const movieCreditsData = movieCreditsResponse.data;
@@ -44,7 +44,7 @@ const addShow = async (req, res) => {
         poster_path: movieApiData.poster_path,
         backdrop_path: movieApiData.backdrop_path,
         genres: movieApiData.genres,
-        casts: movieCreditsData.casts,
+        casts: movieCreditsData.cast,
         release_date: movieApiData.release_date,
         original_language: movieApiData.original_language,
         tagline: movieApiData.tagline || '',
@@ -54,25 +54,36 @@ const addShow = async (req, res) => {
       movie = await Movie.create(movieDetails);
     }
     const showsToCreate = [];
-    showsInput.forEach((show) => {
-      const showDate = show.Date;
-      show.time.forEach((time) => {
+
+    const entries = Array.isArray(showsInput)
+      ? showsInput.map((s) => ({ date: s.Date || s.date, times: s.time || s.times || [] }))
+      : Object.entries(showsInput).map(([date, times]) => ({ date, times }));
+
+    for (const { date: showDate, times } of entries) {
+      for (const time of times) {
         const dateTimeString = `${showDate}T${time}`;
+        const parsedDate = new Date(dateTimeString);
+        if (isNaN(parsedDate.getTime())) {
+          return res.status(400).json({
+            success: false,
+            message: `Invalid date/time: "${dateTimeString}". Expected format: Date="YYYY-MM-DD", time="HH:MM"`,
+          });
+        }
         showsToCreate.push({
           movie: movieId,
-          showDateTime: new Date(dateTimeString),
+          showDateTime: parsedDate,
           showPrice,
           occupiedSeats: {},
         });
-      });
-    });
+      }
+    }
     if (showsToCreate.length > 0) {
       await Show.insertMany(showsToCreate);
     }
     res.json({ success: true, message: 'Show Added Successfully' });
   } catch (error) {
     console.error(error);
-    res.json({ success: false, message: err.message });
+    res.json({ success: false, message: error.message });
   }
 };
 export { addShow, getNowPlayingMovies };
