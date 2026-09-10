@@ -1,6 +1,7 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
 import { Show } from '../models/show.models.js';
+import { Movie } from '../models/movie.models.js';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
@@ -86,4 +87,36 @@ const addShow = async (req, res) => {
     res.json({ success: false, message: error.message });
   }
 };
-export { addShow, getNowPlayingMovies };
+
+const getShows = async (req, res) => {
+  try {
+    const shows = (await Show.find({ showDateTime: { $gte: new Date() } }).populate('movie')).toSorted({
+      showDateTime: 1,
+    });
+    const uniqueShows = new Set(shows.map((show) => show.movie));
+    res.json({ success: true, shows: Array.from(uniqueShows) });
+  } catch (error) {
+    console.error('error occured while getting the shows :', error.message);
+    res.json({ success: true, message: error.message });
+  }
+};
+
+const getShow = async (req, res) => {
+  try {
+    const { movieId } = req.params;
+    const shows = await Show.find({ movie: movieId, showDateTime: { $gte: new Date() } });
+    const movie = await Movie.findById(movieId);
+    const dateTime = {};
+    shows.forEach((show) => {
+      const date = show.showDateTime.toISOString().split('T')[0];
+      if (!dateTime[date]) dateTime[date] = [];
+      dateTime[date].push({ time: show.showDateTime, showId: show._id });
+      res.json({ success: true, movie, dateTime });
+    });
+  } catch (error) {
+    console.error('error occured while getting the show :', error.message);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+export { addShow, getNowPlayingMovies, getShows };
