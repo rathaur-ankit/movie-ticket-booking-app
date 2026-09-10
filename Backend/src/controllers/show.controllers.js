@@ -1,7 +1,6 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
 import { Show } from '../models/show.models.js';
-import { Movie } from '../models/movie.models.js';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
