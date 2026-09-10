@@ -1,5 +1,6 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
+import { Show } from '../models/show.models.js';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
@@ -49,7 +50,25 @@ const addShow = async (req, res) => {
         vote_average: movieApiData.vote_average,
         runtime: movieApiData.runtime,
       };
+      movie = await Movie.create(movieDetails);
     }
+    const showsToCreate = [];
+    showsInput.forEach((show) => {
+      const showDate = show.Date;
+      show.time.forEach((time) => {
+        const dateTimeString = `${showDate}T${time}`;
+        showsToCreate.push({
+          movie: movieId,
+          showDateTime: new Date(dateTimeString),
+          showPrice,
+          occupiedSeats: {},
+        });
+      });
+    });
+    if (showsToCreate.length > 0) {
+      await Show.insertMany(showsToCreate);
+    }
+    res.json({ success: true, message: 'Show Added Successfully' });
   } catch (error) {
     console.error(error);
     res.json({ success: false, message: err.message });
