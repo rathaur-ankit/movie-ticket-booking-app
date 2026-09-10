@@ -1,5 +1,5 @@
 import express from 'express';
-import { addShow, getNowPlayingMovies } from '../controllers/show.controllers.js';
+import { addShow,getNowPlayingMovies } from '../controllers/show.controllers.js';
 
 const showRouter = express.Router();
 
