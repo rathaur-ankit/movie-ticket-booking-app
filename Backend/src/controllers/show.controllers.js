@@ -119,4 +119,4 @@ const getShow = async (req, res) => {
   }
 };
 
-export { addShow, getNowPlayingMovies, getShows };
+export { addShow, getNowPlayingMovies, getShows, getShow };
