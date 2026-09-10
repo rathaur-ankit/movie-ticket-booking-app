@@ -1,6 +1,7 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
 import { Show } from '../models/show.models.js';
+import axios from 'axios';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
