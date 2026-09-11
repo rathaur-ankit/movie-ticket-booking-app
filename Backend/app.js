@@ -29,6 +29,7 @@ app.use('/api/v1/inngest', serve({ client: inngest, functions }));
 app.get('/', (req, res) => {
   res.status(200).send('Server is Live');
 });
+
 app.use('/api/v1/show', showRouter);
 app.use('/api/v1/booking', bookingRouter);
 app.use('/api/v1/admin', adminRouter);
