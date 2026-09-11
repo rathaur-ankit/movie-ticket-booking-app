@@ -56,7 +56,7 @@ const getOccupiedSeats = async (req, res) => {
     res.json({ success: true, occupiedSeats });
   } catch (error) {
     console.log('error occured : ', error.message);
-    res.json({ success: true, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
 

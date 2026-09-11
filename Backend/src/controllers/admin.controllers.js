@@ -9,13 +9,15 @@ const isAdmin = async (req, res) => {
 const getDashboardData = async (req, res) => {
   try {
     const bookings = await Bookings.find({ isPaid: true });
-    const activeShows = await Show.find({ showDateTime: { $gte: new Date() } }).populate('movie');
+    const activeShows = await Show.find({ showDateTime: { $gte: new Date() } })
+      .populate('movie')
+      .sort({ showDateTime: 1 });
     const totalUser = await User.countDocuments();
 
     const dashboardData = {
       totalBookings: bookings.length,
       totalRevenue: bookings.reduce((acc, booking) => acc + booking.amount, 0),
-      activeShows,
+      activeShows: activeShows.filter((show) => show.movie),
       totalUser,
     };
     res.json({ success: true, dashboardData });
@@ -27,10 +29,10 @@ const getDashboardData = async (req, res) => {
 
 const getAllShows = async (req, res) => {
   try {
-    const shows = (await Show.find({ showDateTime: { $gte: new Date() } }).populate('movie')).toSorted({
-      showDateTime: 1,
-    });
-    res.json({ success: true, shows });
+    const shows = await Show.find({ showDateTime: { $gte: new Date() } })
+      .populate('movie')
+      .sort({ showDateTime: 1 });
+    res.json({ success: true, shows: shows.filter((show) => show.movie) });
   } catch (error) {
     console.error(error);
     res.json({ success: false, message: error.message });

@@ -14,7 +14,7 @@ const getUserBookings = async (req, res) => {
     res.json({ success: true, bookings });
   } catch (error) {
     console.error(error);
-    res.json({ succcess: true, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
 
@@ -35,19 +35,19 @@ const updateFavourite = async (req, res) => {
     res.json({ success: true, message: 'Favorite movies updated' });
   } catch (error) {
     console.error(error);
-    res.json({ success: true, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
 
 const getFavorites = async (req, res) => {
   try {
     const user = await clerkClient.users.getUser(req.auth().userId);
-    const favourites = user.privateMetadata.favourites;
+    const favourites = user.privateMetadata?.favourites || [];
     const movies = await Movie.find({ _id: { $in: favourites } });
     res.json({ success: true, movies });
   } catch (error) {
     console.error(error);
-    res.json({ success: true, message: error.message });
+    res.json({ success: false, message: error.message });
   }
 };
 
