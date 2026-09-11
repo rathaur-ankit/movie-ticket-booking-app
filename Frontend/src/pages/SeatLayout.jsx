@@ -1,11 +1,12 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { assets, dummyDateTimeData, dummyShowsData } from '../assets/assets';
 import Loading from '../components/Loading';
+import { assets } from '../assets/assets';
 import { ArrowRightIcon, ClockIcon } from 'lucide-react';
 import isoTimeFormat from '../lib/isoTimeFormat';
 import BlurCircle from '../components/BlurCircle';
 import toast from 'react-hot-toast';
+import { useAppContext } from '../context/AppContext';
 
 const SeatLayout = () => {
   const groupRows = [
@@ -16,26 +17,29 @@ const SeatLayout = () => {
     ['I', 'J'],
   ];
 
+  const [show, setShow] = useState(null);
   const { id, date } = useParams();
   const [selectedSeats, setSelectedSeats] = useState([]);
   const [selectedTime, setSelectedTime] = useState(null);
+  const [occupiedSeats, setOccupiedSeats] = useState([]);
 
-  const show = useMemo(() => {
-    const movie = dummyShowsData.find((show) => show._id === id);
-    if (movie) {
-      return {
-        movie,
-        dateTime: dummyDateTimeData,
-      };
+  const { axios, getToken, user } = useAppContext();
+  const getShow = async () => {
+    try {
+      const { data } = await axios.get(`/api/v1/show/${id}`);
+      if (data.success) setShow(data);
+    } catch (error) {
+      console.error(error);
     }
-    return null;
-  }, [id]);
-
+  };
   const navigate = useNavigate();
 
   const handleSeatClick = (seatId) => {
     if (!selectedTime) return toast('Please select time first');
     if (!selectedSeats.includes(seatId) && selectedSeats.length > 4) return toast('You can only select 5 seats');
+
+    if (occupiedSeats.includes(seatId)) return toast('This seat is already booked');
+
     setSelectedSeats((prev) => (prev.includes(seatId) ? prev.filter((seat) => seat !== seatId) : [...prev, seatId]));
   };
 
@@ -48,7 +52,9 @@ const SeatLayout = () => {
             <button
               key={seatId}
               onClick={() => handleSeatClick(seatId)}
-              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${selectedSeats.includes(seatId) && 'bg-primary text-white'}`}
+              className={`h-8 w-8 rounded border border-primary/60 cursor-pointer ${
+                selectedSeats.includes(seatId) ? 'bg-primary text-white' : ''
+              } ${occupiedSeats.includes(seatId) ? 'opacity-50' : ''}`}
             >
               {seatId}
             </button>
@@ -58,10 +64,49 @@ const SeatLayout = () => {
     </div>
   );
 
+  const getOcccupiedSeats = async () => {
+    try {
+      const { data } = await axios.get(`/api/v1/booking/seats/${selectedTime.showId}`);
+      if (data.success) setOccupiedSeats(data.occupiedSeats);
+      else toast.error(data.message);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  const bookTickets = async () => {
+    try {
+      if (!user) return toast.error('Please login to proceed');
+      if (!selectedTime || !selectedSeats.length) return toast.error('Please select a time and seats');
+
+      const { data } = await axios.post(
+        '/api/v1/booking/create',
+        { showId: selectedTime.showId, selectedSeats },
+        { headers: { Authorization: `Bearer ${await getToken()}` } }
+      );
+
+      if (data.success) {
+        toast.success(data.message);
+        navigate('/my-bookings');
+      } else toast.error(data.message);
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  useEffect(() => {
+    getShow();
+    window.scrollTo(0, 0);
+  }, []);
+
+  useEffect(() => {
+    if (selectedTime) getOcccupiedSeats();
+  }, [selectedTime]);
+
   return show ? (
-    <div className="flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50">
+    <div className="relative flex flex-col md:flex-row px-6 md:px-16 lg:px-40 py-30 md:pt-50 min-h-[80vh]">
       {/*available timings */}
-      <div className="w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30">
+      <div className="w-60 bg-primary/10 border border-primary/20 rounded-lg py-10 h-max md:sticky md:top-30 md:self-start">
         <p className="text-lg font-semibold px-6">Available Timings</p>
 
         <div className="mt-5 space-y-1">
@@ -83,26 +128,28 @@ const SeatLayout = () => {
       </div>
 
       {/* seat layout */}
-      <div className="relative flex-1 flex flex-col items-center max-md:mt-16">
+      <div className="relative flex-1 flex flex-col items-center max-md:mt-16 overflow-hidden isolate w-full">
         <BlurCircle top="-100px" left="-100px" />
         <BlurCircle bottom="0px" right="0px" />
         <h1 className="text-2xl font-semibold mb-4">Select your seat</h1>
         <img src={assets.screenImage} alt="screen" />
         <p className="text-gray-400 text-sm mb-6">SCREEN SIDE</p>
 
-        <div className="flex flex-col items-center mt-10 text-xs text-gray-300">
-          <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-2 mb-6">
-            {groupRows[0].map((row) => renderSeats(row))}
-          </div>
-          <div className="grid grid-cols-2 gap-11">
-            {groupRows.slice(1).map((group, index) => (
-              <div key={index}>{group.map((row) => renderSeats(row))}</div>
-            ))}
+        <div className="w-full overflow-x-auto no-scrollbar py-2">
+          <div className="flex flex-col items-center min-w-max mx-auto mt-10 text-xs text-gray-300">
+            <div className="grid grid-cols-2 md:grid-cols-1 gap-8 md:gap-2 mb-6">
+              {groupRows[0].map((row) => renderSeats(row))}
+            </div>
+            <div className="grid grid-cols-2 gap-11">
+              {groupRows.slice(1).map((group, index) => (
+                <div key={index}>{group.map((row) => renderSeats(row))}</div>
+              ))}
+            </div>
           </div>
         </div>
 
         <button
-          onClick={() => navigate('/my-bookings')}
+          onClick={bookTickets}
           className="flex items-center gap-1 mt-20 px-10 py-3 text-sm bg-primary hover:bg-primary-dull transition rounded-full font-medium cursor-pointer active:scale-95"
         >
           Proceed to Checkout
