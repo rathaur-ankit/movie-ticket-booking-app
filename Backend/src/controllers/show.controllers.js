@@ -34,10 +34,8 @@ const addShow = async (req, res) => {
       movie = await Movie.findOne({ id: movieIdStr });
     }
     if (!movie) {
-      const [movieDetailsResponse, movieCreditsResponse] = await Promise.all([
-        tmdbApi.get(`/movie/${movieIdStr}`),
-        tmdbApi.get(`/movie/${movieIdStr}/credits`),
-      ]);
+      const movieDetailsResponse = await tmdbApi.get(`/movie/${movieIdStr}`);
+      const movieCreditsResponse = await tmdbApi.get(`/movie/${movieIdStr}/credits`);
       const movieApiData = movieDetailsResponse.data;
       const movieCreditsData = movieCreditsResponse.data;
 
