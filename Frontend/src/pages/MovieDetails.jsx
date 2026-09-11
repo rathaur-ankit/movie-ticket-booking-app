@@ -1,6 +1,5 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { dummyDateTimeData, dummyShowsData } from '../assets/assets';
 import BlurCircle from '../components/BlurCircle';
 import { Heart, PlayCircleIcon, StarIcon } from 'lucide-react';
 import timeFormat from '../lib/timeFormat';
@@ -15,16 +14,8 @@ const MovieDetails = () => {
   const { id } = useParams();
   const [show, setShow] = useState(null);
 
-  const {
-    shows,
-    axios,
-    getToken,
-    user,
-    fetchFavoriteMovies,
-    fetchFavouriteMovies,
-    favoriteMovies,
-    image_base_url,
-  } = useAppContext();
+  const { shows, axios, getToken, user, fetchFavoriteMovies, fetchFavouriteMovies, favoriteMovies, image_base_url } =
+    useAppContext();
 
   const getShow = async () => {
     try {
@@ -82,9 +73,7 @@ const MovieDetails = () => {
   }, [id]);
 
   const isFavorite = Boolean(
-    favoriteMovies?.some(
-      (movie) => movie._id === id || movie.id === id || movie._id === show?.movie?._id
-    )
+    favoriteMovies?.some((movie) => movie._id === id || movie.id === id || movie._id === show?.movie?._id)
   );
 
   return show && show.movie ? (
@@ -126,9 +115,7 @@ const MovieDetails = () => {
                 onClick={handleFavorite}
                 className="bg-gray-700 p-2.5 rounded-full transition cursor-pointer active:scale-95"
               >
-                <Heart
-                  className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`}
-                />
+                <Heart className={`w-5 h-5 ${isFavorite ? 'fill-primary text-primary' : ''}`} />
               </button>
             </div>
           </div>
