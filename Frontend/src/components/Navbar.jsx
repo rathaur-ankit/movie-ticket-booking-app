@@ -3,12 +3,14 @@ import { assets } from '../assets/assets.js';
 import { MenuIcon, SearchIcon, TicketPlus, XIcon } from 'lucide-react';
 import { useState } from 'react';
 import { useClerk, UserButton, useUser } from '@clerk/react';
+import { useAppContext } from '../context/AppContext.jsx';
 
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const { user } = useUser();
   const { openSignIn } = useClerk();
   const navigate = useNavigate();
+  const { favoriteMovies } = useAppContext();
 
   const handleLinkClick = () => {
     scrollTo(0, 0);
@@ -40,9 +42,11 @@ const Navbar = () => {
         <Link onClick={handleLinkClick} to="/Release">
           Release
         </Link>
-        <Link onClick={handleLinkClick} to="/favorite">
-          Favourite
-        </Link>
+        {favoriteMovies.length > 0 && (
+          <Link onClick={handleLinkClick} to="/favorite">
+            Favourite
+          </Link>
+        )}
       </div>
 
       <div className="flex items-center gap-8">
