@@ -65,7 +65,7 @@ const AddShows = () => {
         showsInput,
         showPrice: Number(showPrice),
       };
-      const { data } = await axios.get('/api/show/add', payload, {
+      const { data } = await axios.post('/api/v1/show/add', payload, {
         headers: {
           Authorization: `Bearer ${await getToken()}`,
         },
