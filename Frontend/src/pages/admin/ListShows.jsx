@@ -5,7 +5,7 @@ import { dateFormate } from '../../lib/dateFormat';
 import { useAppContext } from '../../context/AppContext';
 
 const ListShows = () => {
-  const [axios, getToken, user] = useAppContext();
+  const { axios, getToken, user } = useAppContext();
   const currency = import.meta.env.VITE_CURRENCY;
   const [shows, setShows] = useState([]);
   const [loading, setLoading] = useState(true);
