@@ -15,10 +15,10 @@ const MyBookings = () => {
 
   const getMyBookings = async () => {
     try {
-      const { data } = await axios.get('/api/v1/bookings', {
+      const { data } = await axios.get('/api/v1/user/bookings', {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
-      if (data.success) setBookings(data.bookings);
+      if (data.success) setBookings(data.bookings || []);
     } catch (error) {
       console.error(error);
     }
