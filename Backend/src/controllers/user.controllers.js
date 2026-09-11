@@ -1,5 +1,6 @@
 import { clerkClient } from '@clerk/express';
-import { Bookings } from '../models/booking.models';
+import { Bookings } from '../models/booking.models.js';
+import { Movie } from '../models/movie.models.js';
 
 const getUserBookings = async (req, res) => {
   try {
@@ -38,4 +39,16 @@ const updateFavourite = async (req, res) => {
   }
 };
 
-export { getUserBookings, updateFavourite };
+const getFavorites = async (req, res) => {
+  try {
+    const user = await clerkClient.users.getUser(req.auth().userId);
+    const favourites = user.privateMetadata.favourites;
+    const movies = await Movie.find({ _id: { $in: favourites } });
+    res.json({ success: true, movies });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: true, message: error.message });
+  }
+};
+
+export { getUserBookings, updateFavourite, getFavorites };
