@@ -53,4 +53,4 @@ const getAllBookings = async (req, res) => {
   }
 };
 
-export { isAdmin };
+export { isAdmin, getDashboardData, getAllBookings, getAllShows };
