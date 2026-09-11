@@ -9,6 +9,7 @@ import { inngest, functions } from './src/utils/inngest.js';
 import { showRouter } from './src/routes/show.routes.js';
 import { bookingRouter } from './src/routes/booking.routes.js';
 import { adminRouter } from './src/routes/admin.routes.js';
+import { userRouter } from './src/routes/user.routes.js';
 
 const app = express();
 
@@ -33,5 +34,6 @@ app.get('/', (req, res) => {
 app.use('/api/v1/show', showRouter);
 app.use('/api/v1/booking', bookingRouter);
 app.use('/api/v1/admin', adminRouter);
+app.use('/api/v1/user', userRouter);
 
 export { app };
