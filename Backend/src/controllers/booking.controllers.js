@@ -1,5 +1,6 @@
 import { Bookings } from '../models/booking.models.js';
 import { Show } from '../models/show.models.js';
+import stripe from 'stripe';
 
 const checkSeatAvailability = async (showId, selectedSeats) => {
   try {
@@ -40,8 +41,32 @@ const createBooking = async (req, res) => {
     await showData.save();
 
     // Strive payment gateway
-
-    res.json({ success: true, message: 'Booked Successfully' });
+    const stripeInstance = new stripe(process.env.STRIPE_SECRET_KEY);
+    const line_items = [
+      {
+        price_data: {
+          currency: 'euro',
+          product_data: {
+            name: showData.movie.title,
+          },
+          unit_amount: Math.floor(booking.amount) * 100,
+        },
+        quantity: 1,
+      },
+    ];
+    const session = await stripeInstance.checkout.sessions.create({
+      success_url: `${origin}/loading/my-bookings`,
+      cancel_url: `${origin}/my-bookings`,
+      line_items: line_items,
+      mode: 'payment',
+      metadata: {
+        bookingId: booking._id.toString(),
+      },
+      expire_at: Math.floor(Date.now / 1000) + 30 * 60, //expire in 30 min
+    });
+    booking.paymentLink = session.url;
+    await booking.save();
+    res.json({ success: true, url: session.url });
   } catch (error) {
     console.log('error occured : ', error.message);
     res.json({ success: false, message: error.message });
