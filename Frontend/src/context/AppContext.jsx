@@ -22,7 +22,7 @@ const AppProvider = ({ children }) => {
 
   const fetchIsAdmin = async () => {
     try {
-      const { data } = await axios.get('/api/v1/admin/is-admin', {
+      const { data } = await axios.get('/api/v1/admin/isAdmin', {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       setIsAdmin(data.isAdmin);
