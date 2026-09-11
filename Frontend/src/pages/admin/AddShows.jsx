@@ -38,6 +38,7 @@ const AddShows = () => {
       if (!times.includes(time)) return { ...prev, [date]: [...times, time] };
       return prev;
     });
+    setDateTimeInput('');
   };
 
   const handleRemoveTime = (date, time) => {
@@ -53,12 +54,25 @@ const AddShows = () => {
   };
 
   const handleSubmit = async () => {
+    let currentSelection = { ...dateTimeSelection };
+    if (Object.keys(currentSelection).length === 0 && dateTimeInput) {
+      const [date, time] = dateTimeInput.split('T');
+      if (date && time) {
+        currentSelection = { [date]: [time] };
+      }
+    }
+
+    if (!selectedMovie || Object.keys(currentSelection).length === 0 || !showPrice) {
+      return toast.error('Missing required fields');
+    }
+
     try {
       setAddingShow(true);
-      if (!selectedMovie || Object.keys(dateTimeSelection).length === 0 || !showPrice)
-        return toast('Missing required fields');
 
-      const showsInput = Object.entries(dateTimeSelection).map(([date, time]) => ({ date, time }));
+      const showsInput = Object.entries(currentSelection).map(([date, times]) => ({
+        date,
+        time: Array.isArray(times) ? times : [times],
+      }));
 
       const payload = {
         movieId: selectedMovie,
@@ -75,6 +89,7 @@ const AddShows = () => {
         toast.success(data.message);
         setSelectedMovie(null);
         setDateTimeSelection({});
+        setDateTimeInput('');
         setShowPrice('');
       } else {
         toast.error(data.message);
@@ -82,8 +97,9 @@ const AddShows = () => {
     } catch (error) {
       console.error('Submission error :', error);
       toast.error('An error occurred. Please try again');
+    } finally {
+      setAddingShow(false);
     }
-    setAddingShow(false);
   };
 
   useEffect(() => {
@@ -192,9 +208,9 @@ const AddShows = () => {
       <button
         onClick={handleSubmit}
         disabled={addingShow}
-        className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer"
+        className="bg-primary text-white px-8 py-2 mt-6 rounded hover:bg-primary/90 transition-all cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Add Show
+        {addingShow ? 'Adding Show...' : 'Add Show'}
       </button>
     </>
   ) : (
