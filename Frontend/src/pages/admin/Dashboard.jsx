@@ -32,8 +32,8 @@ const Dashboard = () => {
 
   const fetchDashboardData = async () => {
     try {
-      const { data } = axios.get('/api/v1/admin/dashboard', {
-        headers: { Authorization: `Bearer ${await getToken}` },
+      const { data } = await axios.get('/api/v1/admin/dashboard', {
+        headers: { Authorization: `Bearer ${await getToken()}` },
       });
 
       if (data.success) {
@@ -77,7 +77,7 @@ const Dashboard = () => {
             key={show._id}
             className="w-55 rounded-lg overflow-hidden h-full pb-3 bg-primary/10 border border-primary/20 hover: -translate-y-1 transition duration-300"
           >
-            <img src={show.movie.poster_path} alt="" className="h-60 w-full object-cover" />
+            <img src={image_base_url + show.movie.poster_path} alt="" className="h-60 w-full object-cover" />
             <p className="font-medium p-2 truncate">{show.movie.title}</p>
             <div className="flex items-center justify-between px-2">
               <p className="text-lg font-medium">
