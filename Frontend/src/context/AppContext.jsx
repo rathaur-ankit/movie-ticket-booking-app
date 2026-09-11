@@ -60,7 +60,7 @@ const AppProvider = ({ children }) => {
 
   useEffect(() => {
     fetchShows();
-  });
+  }, []);
 
   useEffect(() => {
     if (user) {
