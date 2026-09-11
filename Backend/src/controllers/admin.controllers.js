@@ -25,4 +25,16 @@ const getDashboardData = async (req, res) => {
   }
 };
 
+const getAllShows = async (req, res) => {
+  try {
+    const shows = (await Show.find({ showDateTime: { $gte: new Date() } }).populate('movie')).toSorted({
+      showDateTime: 1,
+    });
+    res.json({ success: true, shows });
+  } catch (error) {
+    console.error(error);
+    res.json({ success: false, message: error.message });
+  }
+};
+
 export { isAdmin };
