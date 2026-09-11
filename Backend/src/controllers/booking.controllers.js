@@ -62,7 +62,7 @@ const createBooking = async (req, res) => {
       metadata: {
         bookingId: booking._id.toString(),
       },
-      expire_at: Math.floor(Date.now / 1000) + 30 * 60, //expire in 30 min
+      expires_at: Math.floor(Date.now / 1000) + 30 * 60, //expire in 30 min
     });
     booking.paymentLink = session.url;
     await booking.save();
