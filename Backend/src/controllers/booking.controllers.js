@@ -1,5 +1,5 @@
-import { Bookings } from '../models/booking.models';
-import { Show } from '../models/show.models';
+import { Bookings } from '../models/booking.models.js';
+import { Show } from '../models/show.models.js';
 
 const checkSeatAvailability = async (showId, selectedSeats) => {
   try {
@@ -27,39 +27,37 @@ const createBooking = async (req, res) => {
     const showData = await Show.findById(showId).populate('movie');
 
     const booking = await Bookings.create({
-        user:userId,
-        show:showId,
-        amount:showData.showPrice*selectedSeats.length;
-        bookedSeats:selectedSeats
-    })
-       selectedSeats.map((seat)=>{
-        showData.occupiedSeats[seat]=userId;
-       })
+      user: userId,
+      show: showId,
+      amount: showData.showPrice * selectedSeats.length,
+      bookedSeats: selectedSeats,
+    });
+    selectedSeats.map((seat) => {
+      showData.occupiedSeats[seat] = userId;
+    });
 
-       showData.markModified('occupiedSeats');
-       await showData.save();
+    showData.markModified('occupiedSeats');
+    await showData.save();
 
-       // Strive payment gateway
+    // Strive payment gateway
 
-       res.json({success:true,message:"Booked Successfully"});
-
+    res.json({ success: true, message: 'Booked Successfully' });
   } catch (error) {
-    console.log("error occured : ",error.message);
-    res.json({success:false,message:error.message});
+    console.log('error occured : ', error.message);
+    res.json({ success: false, message: error.message });
   }
 };
 
-const getOccupiedSeats=async (req,res) => {
-    try {
-        const {showId}=req.params;
-         const showData=await Show.findById(showId);
-         const occupiedSeats=Object.keys(showData.occupiedSeats)
-         res.json({success:true,occupiedSeats});
-         
-    } catch (error) {
-      console.log("error occured : ",error.message);
-      res.json({success:true,message:error.message});
-    }
-}
+const getOccupiedSeats = async (req, res) => {
+  try {
+    const { showId } = req.params;
+    const showData = await Show.findById(showId);
+    const occupiedSeats = Object.keys(showData.occupiedSeats);
+    res.json({ success: true, occupiedSeats });
+  } catch (error) {
+    console.log('error occured : ', error.message);
+    res.json({ success: true, message: error.message });
+  }
+};
 
-export { createBooking,getOccupiedSeats };
+export { createBooking, getOccupiedSeats };
