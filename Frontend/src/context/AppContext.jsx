@@ -48,7 +48,7 @@ const AppProvider = ({ children }) => {
 
   const fetchFavouriteMovies = async () => {
     try {
-      const { data } = await axios.get('/api/v1/user/favorites', {
+      const { data } = await axios.get('/api/v1/user/favorite', {
         headers: { Authorization: `Bearer ${await getToken()}` },
       });
       if (data.success) setFavoriteMovies(data.movies);
