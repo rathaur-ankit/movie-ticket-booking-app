@@ -10,6 +10,7 @@ import { showRouter } from './src/routes/show.routes.js';
 import { bookingRouter } from './src/routes/booking.routes.js';
 import { adminRouter } from './src/routes/admin.routes.js';
 import { userRouter } from './src/routes/user.routes.js';
+import { stripeWebhooks } from './src/controllers/stripeWebhooks.controllers.js';
 
 const app = express();
 
@@ -24,6 +25,9 @@ app.use(
     optionsSuccessStatus: 200,
   })
 );
+
+//Stripe Webhooks Route
+app.use('/api/v1/stripe', express.raw({ type: 'application/json' }), stripeWebhooks);
 
 // routes start from here
 app.use('/api/v1/inngest', serve({ client: inngest, functions }));
