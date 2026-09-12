@@ -89,7 +89,7 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
 // inngest function to send email to user on successfull booking
 const sendBookingConfirmationEmail = inngest.createFunction(
   {
-    id: 'release-seats-delete-booking',
+    id: 'send-booking-confirmation-email',
     triggers: { event: 'app/checkpayment' },
   },
   async ({ event, step }) => {
@@ -119,13 +119,15 @@ const sendBookingConfirmationEmail = inngest.createFunction(
 );
 
 //inngest function to send remiders
-const sendShowReminders = inngest.createFunction({
-  id: 'send-show-reminders',
-  triggers: { cron:"0 */8 * * *" },
-  async ({step}) => {
-    const now=new Date();
-    const in8Hours=new Date(now.getTime()+8*60*60*1000);
-    const windowStart=new Date(in8Hours.getTime()-10*60*1000);
+const sendShowReminders = inngest.createFunction(
+  {
+    id: 'send-show-reminders',
+    triggers: { cron: '0 */8 * * *' },
+  },
+  async ({ step }) => {
+    const now = new Date();
+    const in8Hours = new Date(now.getTime() + 8 * 60 * 60 * 1000);
+    const windowStart = new Date(in8Hours.getTime() - 10 * 60 * 1000);
 
     const reminderTasks = await step.run('prepare-reminder-tasks', async () => {
       const shows = await Show.find({
@@ -141,11 +143,11 @@ const sendShowReminders = inngest.createFunction({
 
         for (const user of users) {
           tasks.push({
-            userEmail:user.email,
-            userName:user.name,
-            movieTitle:show.movie.title,
-            showTime:show.showTime,
-          })
+            userEmail: user.email,
+            userName: user.name,
+            movieTitle: show.movie.title,
+            showTime: show.showDateTime,
+          });
         }
       }
       return tasks;
@@ -172,18 +174,20 @@ const sendShowReminders = inngest.createFunction({
     <p>It starts in approximately <strong>8 hours</strong> - make sure you're ready!</p>
     <br/>
     <p>Enjoy the show!<br/>QuickShow Team</p>
-  </div>`
-      })))
-    })
-    const sent =results.filer(r=>r.status==="fulfilled").length;
-    const failed=results.length-sent;
+  </div>`,
+          })
+        )
+      );
+    });
+    const sent = results.filter((r) => r.status === 'fulfilled').length;
+    const failed = results.length - sent;
     return {
       sent,
       failed,
-      message:`Send ${sent} reminder(s), ${failed} failed.`
-    }
+      message: `Send ${sent} reminder(s), ${failed} failed.`,
+    };
   }
-});
+);
 
 export const functions = [
   syncUserCreation,
