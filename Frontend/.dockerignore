@@ -6,3 +6,4 @@ dist
 .env.*
 README.md 
 npm-debug.log*
+vercel.json
