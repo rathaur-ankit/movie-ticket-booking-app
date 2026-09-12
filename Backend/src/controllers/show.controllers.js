@@ -1,6 +1,7 @@
 import { tmdbApi } from '../utils/tmdb.js';
 import { Movie } from '../models/movie.models.js';
 import { Show } from '../models/show.models.js';
+import { inngest } from '../utils/inngest.js';
 
 const getNowPlayingMovies = async (req, res) => {
   try {
@@ -83,6 +84,13 @@ const addShow = async (req, res) => {
     if (showsToCreate.length > 0) {
       await Show.insertMany(showsToCreate);
     }
+
+    //Trigger inngest event
+    await inngest.send({
+      name: 'app/show.added',
+      data: { movieTitle: movie.title },
+    });
+
     res.json({ success: true, message: 'Show Added Successfully' });
   } catch (error) {
     console.error(error);
@@ -97,9 +105,7 @@ const getShows = async (req, res) => {
       .sort({ showDateTime: 1 });
     const uniqueShows = Array.from(
       new Map(
-        shows
-          .filter((show) => show.movie)
-          .map((show) => [show.movie._id?.toString() || show.movie.id, show.movie])
+        shows.filter((show) => show.movie).map((show) => [show.movie._id?.toString() || show.movie.id, show.movie])
       ).values()
     );
     res.json({ success: true, shows: uniqueShows });
