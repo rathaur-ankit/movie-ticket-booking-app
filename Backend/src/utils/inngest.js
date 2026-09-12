@@ -59,7 +59,6 @@ const syncUserUpdate = inngest.createFunction(
 );
 
 // inngest function to cancel booking and release seats of show after 10 minutes of booking created if payment is not made
-
 const releaseSeatsAndDeleteBooking = inngest.createFunction(
   {
     id: 'release-seats-delete-booking',
@@ -83,6 +82,23 @@ const releaseSeatsAndDeleteBooking = inngest.createFunction(
         await Bookings.findByIdAndDelete(booking._id);
       }
     });
+  }
+);
+
+// inngest function to send email to user on successfull booking
+const sendBookingConfirmationEmail = inngest.createFunction(
+  {
+    id: 'release-seats-delete-booking',
+    triggers: { event: 'app/checkpayment' },
+  },
+  async ({ event, step }) => {
+    const { bookingId } = event.data;
+    const booking = await Bookings.findById(bookingId)
+      .populate({
+        path: 'show',
+        populate: { path: 'movie', model: 'Movie' },
+      })
+      .populate('user');
   }
 );
 
