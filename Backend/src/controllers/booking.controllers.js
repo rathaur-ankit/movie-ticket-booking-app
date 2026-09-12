@@ -2,6 +2,7 @@ import { Bookings } from '../models/booking.models.js';
 import { Show } from '../models/show.models.js';
 import { Movie } from '../models/movie.models.js';
 import stripe from 'stripe';
+import { inngest } from '../utils/inngest.js';
 
 const checkSeatAvailability = async (showId, selectedSeats) => {
   try {
@@ -84,6 +85,15 @@ const createBooking = async (req, res) => {
       });
       booking.paymentLink = session.url;
       await booking.save();
+
+      //Run inngest scheduler to check payment
+      await inngest.send({
+        name: 'app/checkpayment',
+        data: {
+          bookingId: booking._id.toString(),
+        },
+      });
+
       return res.json({ success: true, url: session.url });
     } catch (stripeError) {
       // Rollback occupied seats and booking if stripe session creation fails
