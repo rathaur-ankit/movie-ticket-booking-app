@@ -1,0 +1,18 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend-svc
+  namespace: movie-ticket
+  labels:
+    app: backend
+    tier: api
+    app.kubernetes.io/part-of: movie-ticket-booking
+spec:
+  type: ClusterIP
+  selector:
+    app: backend
+  ports:
+    - port: 5000
+      targetPort: 5000
+      protocol: TCP
+      name: http
