@@ -1,0 +1,19 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: mongo-svc
+  namespace: movie-ticket
+  labels:
+    app: mongo
+    tier: database
+    app.kubernetes.io/part-of: movie-ticket-booking
+spec:
+  type: ClusterIP
+  clusterIP: None
+  selector:
+    app: mongo
+  ports:
+    - port: 27017
+      targetPort: 27017
+      protocol: TCP
+      name: mongo
