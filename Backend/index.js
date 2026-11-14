@@ -2,12 +2,19 @@ import { connectDB } from './src/config/db.js';
 import 'dotenv/config';
 import { app } from './app.js';
 
-connectDB()
-  .then(() => {
-    app.listen(process.env.PORT, () => {
-      console.log(`Server is running on the Port ${process.env.PORT}`);
+const PORT = process.env.PORT || 5000;
+
+if (!process.env.VERCEL) {
+  connectDB()
+    .then(() => {
+      app.listen(PORT, () => {
+        console.log(`Server is running on the Port ${PORT}`);
+      });
+    })
+    .catch((err) => {
+      console.error('Error occurred while starting the server:', err.message);
     });
-  })
-  .catch((err) => {
-    console.log('error occurred in while starting the server ');
-  });
+}
+
+export default app;
+export { app };
